@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- Constructor injection via index-->
+    <bean id="freightConstIndex" class="org.demo.model.Freight">
+        <constructor-arg index="0" value="101"></constructor-arg>
+        <constructor-arg index="1" value="Mumbai"></constructor-arg>
+        <constructor-arg index="2" value="Pune"></constructor-arg>
+    </bean>
+    <!-- Constructor injection via name-->
+    <bean id="freightConstName" class="org.demo.model.Freight">
+        <constructor-arg name="origin" value="Banglore"></constructor-arg>
+        <constructor-arg name="orderId" value="102"></constructor-arg>
+        <constructor-arg name="destination"
+                         value="Pune"></constructor-arg>
+    </bean>
+    <!-- Constructor injection via type-->
+    <bean id="freightConstType" class="org.demo.model.Freight">
+        <constructor-arg type="java.lang.String"
+                         value="Mumbai"></constructor-arg>
+        <constructor-arg type="java.lang.String"
+                         value="Noida"></constructor-arg>
+        <constructor-arg type="int" value="103"></constructor-arg>
+    </bean>
+    <!-- Define the Freight bean with inline property values -->
+    <!-- Setter injection-->
+    <bean id="freight" class="org.demo.model.Freight">
+        <property name="orderId" value="123" />
+        <property name="origin" value="Source" />
+        <property name="destination" value="Destination" />
+    </bean>
+    <!-- Setter injection for Collection - List -->
+    <bean id="listOfFreight" class="java.util.ArrayList" />
+    <bean id="freightRepository"
+          class="org.demo.repository.FreightRepositoryImpl">
+        <property name="freightList" ref="listOfFreight"></property>
+    </bean>
+    <bean id="freightService" class="org.demo.service.FreightServiceImpl">
+        <property name="freightRepository" ref="freightRepository"></property>
+    </bean>
+    <!--
+    <property name="customList">
+    <list>
+    <value>INDIA</value>
+    <value>Pakistan</value>
+    <value>USA</value>
+    <value>UK</value>
+    </list>
+    </property>
+    <property name="customSet">
+    <set>
+    <value>INDIA</value>
+    <value>UAE</value>
+    <value>USA</value>
+    <value>Japan</value>
+    </set>
+    </property>
+    <property name="customMap">
+    <map>
+    <entry key="1" value="INDIA"/>
+    <entry key="2" value="Pakistan"/>
+    <entry key="3" value="USA"/>
+    <entry key="4" value="UK"/>
+    </map>
+    </property>
+    <property name="customProperies">
+    <props>
+    <prop key="admin">admin@nospam.com</prop>
+    <prop key="support">support@nospam.com</prop>
+    </props>
+    </property>
+    -->
+</beans>
