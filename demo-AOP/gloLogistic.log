@@ -1,3 +1,0 @@
-2025-08-26 16:56:36,693 INFO  [main] org.demo.AppMain - Starting AppMain using Java 21.0.1 with PID 21932 (C:\Users\zahar\OneDrive\Desktop\GlobalLogic\java-playground\demo-AOP\target\classes started by zahar in C:\Users\zahar\OneDrive\Desktop\GlobalLogic\java-playground\demo-AOP)
-2025-08-26 16:56:36,702 INFO  [main] org.demo.AppMain - No active profile set, falling back to 1 default profile: "default"
-2025-08-26 16:56:38,812 INFO  [main] org.demo.AppMain - Started AppMain in 3.528 seconds (process running for 5.35)
