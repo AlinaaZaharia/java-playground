@@ -1,0 +1,29 @@
+package org.example.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "freight")
+public class Freight {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long orderId;
+
+    @Column(name = "origin",nullable = false)
+    private String origin;
+
+    @Column(name = "destination",nullable = false)
+    private String destination;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id",nullable = false)
+    private Customer customer;
+}

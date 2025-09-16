@@ -1,0 +1,101 @@
+package org.example.service.impl;
+
+import org.example.entity.Customer;
+import org.example.exception.FreightAPIException;
+import org.example.exception.ResourceNotFoundException;
+import org.example.payload.CustomerDto;
+import org.example.payload.CustomerResponse;
+import org.example.repository.CustomerRepository;
+import org.example.service.CustomerService;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+public class CustomerServiceImpl implements CustomerService {
+    private CustomerRepository customerRepository;
+    private ModelMapper modelMapper;
+    private PasswordEncoder passwordEncoder;
+
+    public CustomerServiceImpl(CustomerRepository customerRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+        this.customerRepository = customerRepository;
+        this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    // map to dto
+    private CustomerDto mapToDto(Customer customer){
+        return modelMapper.map(customer,CustomerDto.class);
+    }
+
+    // map to entity
+    private Customer mapToEntity(CustomerDto customerDto){
+        return modelMapper.map(customerDto,Customer.class);
+    }
+
+    @Override
+    public String createCustomer(CustomerDto customerDto) {
+//check email
+        if(customerRepository.existsByCustomerEmail(customerDto.getCustomerEmail()))
+            throw new FreightAPIException(HttpStatus.BAD_REQUEST,"Email already exists");
+//set the user object
+        Customer customer = new Customer();
+        customer.setCustomerName(customerDto.getCustomerName());
+        customer.setCustomerPassword(passwordEncoder.encode(customerDto.getCustomerPassword()));
+        customer.setCustomerEmail(customerDto.getCustomerEmail());
+        customer.setRole("ROLE_USER");
+//user is registered in the database
+        customerRepository.save(customer);
+        return "User registered successfully";
+    }
+
+    @Override
+    public CustomerDto updateCustomer(long id, CustomerDto customerDto) {
+        Customer customer = customerRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "id", id));
+        customer.setCustomerName(customerDto.getCustomerName());
+        customer.setCustomerEmail(customerDto.getCustomerEmail());
+        Customer updated = customerRepository.save(customer);
+        return mapToDto(updated);
+    }
+
+    @Override
+    public CustomerResponse getCustomers(int pageNo, int pageSize, String
+            sortBy, String sortDir) {
+            Sort sort =
+                sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?Sort.by(sortBy).ascending(
+                ):Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+        Page<Customer> all = customerRepository.findAll(pageable);
+        Set<CustomerDto> contents = all.getContent().stream().map(c -> mapToDto(c)).collect(Collectors.toSet());
+        CustomerResponse customerResponse = new CustomerResponse();
+        customerResponse.setContent(contents);
+        customerResponse.setPageNo(all.getNumber());
+        customerResponse.setPageSize(all.getSize());
+        customerResponse.setTotalPages(all.getTotalPages());
+        customerResponse.setTotalElements(all.getTotalElements());
+        customerResponse.setLast(all.isLast());
+        return customerResponse;
+    }
+
+    @Override
+    public CustomerDto getCustomerById(long id) {
+        Customer customer = customerRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "id", id));
+        return mapToDto(customer);
+    }
+
+    @Override
+    public void removeCustomer(long id) {
+        Customer customer = customerRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Customer", "id", id));
+        customerRepository.delete(customer);
+    }
+}
